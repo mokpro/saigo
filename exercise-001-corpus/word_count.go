@@ -20,6 +20,6 @@ func main() {
 
 	wordFreqs := corpus.Analyze(string(content))
 	for _, word := range wordFreqs {
-		fmt.Println(word.Count, " ", word.Word)
+		fmt.Println(word.Count, word.Word)
 	}
 }

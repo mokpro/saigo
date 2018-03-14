@@ -13,37 +13,30 @@ type WordFrequency struct {
 }
 
 // Analyze does something, Chris told me to write it this way!
-func Analyze(initialSt string) []WordFrequency {
-	filteredSt := removePuncuations(initialSt)
-	wordFreqs := wordCountGenerator(filteredSt)
+func Analyze(rawSt string) []WordFrequency {
+	sanitizedStArr := sanitize(rawSt)
+	wordFreqs := wordCountGenerator(sanitizedStArr)
 	return descSortOnWordCount(wordFreqs)
 }
 
-func removePuncuations(initialSt string) string {
-	rg := regexp.MustCompile("[^a-zA-Z ]")
-	return rg.ReplaceAllLiteralString(initialSt, "")
+func sanitize(rawSt string) []string {
+	rg := regexp.MustCompile("[^a-zA-Z0-9' ]+")
+	str := rg.ReplaceAllLiteralString(rawSt, "")
+	return strings.Fields(strings.ToLower(str))
 }
 
-func wordCountGenerator(filteredSt string) []WordFrequency {
-	wordMap := make(map[string]WordFrequency)
+func wordCountGenerator(sanitizedStArr []string) []WordFrequency {
+	wordMap := make(map[string]int)
 
-	for _, word := range strings.Split(filteredSt, " ") {
-		_, exists := wordMap[word]
-
-		if exists {
-			wordFreq := wordMap[word]
-			wordFreq.Count++
-			wordMap[word] = wordFreq
-		} else if word != "" {
-			wordMap[word] = WordFrequency{Word: word, Count: 1}
-		}
+	for _, word := range sanitizedStArr {
+		wordMap[word]++
 	}
 	wordMapLen := len(wordMap)
 	wordFreqs := make([]WordFrequency, wordMapLen)
 
-	for _, wordFreq := range wordMap {
+	for word, count := range wordMap {
 		wordMapLen--
-		wordFreqs[wordMapLen] = wordFreq
+		wordFreqs[wordMapLen] = WordFrequency{Word: word, Count: count}
 	}
 
 	return wordFreqs
